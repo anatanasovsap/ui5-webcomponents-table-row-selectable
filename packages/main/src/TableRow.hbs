@@ -28,6 +28,9 @@
 				aria-label="{{ariaLabelRowSelection}}"
 				@ui5-change="{{_handleSelection}}"
 				tabindex="-1"
+				{{#unless this.selectable}}
+					disabled="true"
+				{{/unless}}
 			>
 			</ui5-checkbox>
 		</td>

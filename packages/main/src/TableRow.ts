@@ -138,6 +138,18 @@ class TableRow extends UI5Element implements ITableRow, ITabbable {
 	 *
 	 * @type {boolean}
 	 * @name sap.ui.webc.main.TableRow.prototype.selected
+	 * @defaultvalue true
+	 * @since N/A
+	 * @public
+	 */
+	@property({ type: Boolean })
+	selectable!: boolean;
+
+	/**
+	 * Defines the row's selected state.
+	 *
+	 * @type {boolean}
+	 * @name sap.ui.webc.main.TableRow.prototype.selected
 	 * @defaultvalue false
 	 * @since 1.0.0-rc.15
 	 * @public
@@ -235,10 +247,10 @@ class TableRow extends UI5Element implements ITableRow, ITabbable {
 		const activeElement = getActiveElement() as HTMLElement;
 		const itemActive = this.type === TableRowType.Active;
 		const isSingleSelect = this.isSingleSelect;
-		const itemSelectable = isSingleSelect || this.isMultiSelect;
+		const itemSelectable = this.selectable && (isSingleSelect || this.isMultiSelect);
 		const isRowFocused = this._activeElementHasAttribute("ui5-table-row");
 		const target = e.target as HTMLElement;
-		const checkboxPressed = target.classList.contains("ui5-multi-select-checkbox");
+		const checkboxPressed = target.classList.contains("ui5-multi-select-checkbox") && this.selectable;
 		const rowElements = Array.from(this.shadowRoot!.querySelectorAll("tr") || []);
 		const elements = rowElements.map(getLastTabbableElement);
 		const lastFocusableElement = elements.pop();
@@ -298,7 +310,7 @@ class TableRow extends UI5Element implements ITableRow, ITabbable {
 	}
 
 	_onrowclick(e: MouseEvent) {
-		const checkboxPressed = (e.target as HTMLElement).classList.contains("ui5-multi-select-checkbox");
+		const checkboxPressed = (e.target as HTMLElement).classList.contains("ui5-multi-select-checkbox") && this.selectable;
 		// If the user tab over a button on IOS device, the document.activeElement
 		// is the ui5-table-row. The check below ensure that, if a button within the row is pressed,
 		// the row will not be selected.
@@ -423,7 +435,7 @@ class TableRow extends UI5Element implements ITableRow, ITabbable {
 
 	get ariaLabelText() {
 		const isSelected = this.selected ? TableRow.i18nBundle.getText(LIST_ITEM_SELECTED) : TableRow.i18nBundle.getText(LIST_ITEM_NOT_SELECTED);
-		const isRowSelectable = this.isSingleSelect || this.isMultiSelect;
+		const isRowSelectable = this.selectable && (this.isSingleSelect || this.isMultiSelect);
 		const ariaLabel = this.cells.map((cell, index) => {
 			const columText = this.getColumnTextByIdx(index);
 			const cellText = cell.cellContent.length ? this.getCellText(cell) : cell.ariaLabelEmptyCellText;
